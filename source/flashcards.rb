@@ -1,5 +1,6 @@
 # Main file for
 
+
 class Card
   attr_reader :question, :answer
 
@@ -10,7 +11,7 @@ class Card
   end
 
   def to_s
-    "{@question}"
+    "{@answer}"
   end
 end
 
@@ -50,26 +51,22 @@ class Start_game
 
 end
 
+class CardFactory
 
+end
+
+#hey matt use this!
 class Controller
 
   def initialize
     #make cards?
+    @card_content_array = []
   end
 
-  def generate_cards_from_csv
-    CSV.foreach("flashcard_samples.txt") do |card|
-      card = Card.new
-      @flashcards << card.to_s
-    end
-  end
-
-  def write_cards_to_csv
-    CSV.open("flashcard_samples.txt", "w") do |csv|
-      @flashcards.each do |card|
-        csv << card.to_s
-      end
-    end
+  def format_txt_file
+    File.readlines("flashcard_samples.txt").each_slice(3){|s|
+      p @card_content_array = [s[0].strip, s[1].strip]
+      }
   end
 
 end
@@ -77,5 +74,20 @@ end
 game = UI.new(Card.new("What is 1 + 2 ?", "3"))
 game.play
 
+c = Controller.new
+c.format_txt_file
 
+  # def generate_cards_from_csv
+  #   CSV.foreach("flashcard_samples.txt") do |card|
+  #     card = Card.new
+  #     @flashcards << card.to_s
+  #   end
+  # end
 
+  # def write_cards_to_csv
+  #   CSV.open("flashcard_samples.txt", "w") do |csv|
+  #     @flashcards.each do |card|
+  #       csv << card.to_s
+  #     end
+  #   end
+  # end
