@@ -1,0 +1,5 @@
+To create a second name for the variable or method,alias
+A command that appends two or more objects together,and
+Gives an unconditional termination to a code block and is usually placed with an argument,break
+Opens a class definition block which can later be reopened and added to with variables and even functions,class
+Much like else but has a higher precedence and is usually paired with terms,elsif
