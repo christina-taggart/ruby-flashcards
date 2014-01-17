@@ -44,8 +44,7 @@ class Deck
 
   def top_card
     top = @cards.first
-    @cards.shift
-    @cards.push(top)
+    @cards.rotate!
     top
   end
 
@@ -62,12 +61,18 @@ end
 #---FLASHCARDS - CLI FLASHCARD VIEWER-----
 
 class FlashCards
+  @@correct_counter = 0
+  @@card_counter = 0
+
   def self.quiz(deck_file, quiz_type = "ordered")
-    deck = build_deck(deck_file)
+    deck = DeckBuilder.csv_to_deck(deck_file)
+    reset_counters
     deck.shuffle if quiz_type == "random"
     deck.length.times do
       test_card(deck.top_card)
     end
+    puts "\nDECK QUIZ COMPLETE!"
+    puts "PERCENT CORRECT: #{percent_correct}%"
   end
 
   private
@@ -76,30 +81,46 @@ class FlashCards
     attempts = 0
     guess = String.new
     while attempts < 3
-      puts "\nFRONT:"
-      puts "#{card.front}"
+      puts "\n#{card.front}"
       puts "Enter guess (or 'SKIP'):"
       guess = gets.chomp
-      if guess == card.back
+      if guess.downcase == card.back.downcase
         puts "\nCorrect!\n"
+        increment_correct_counter
+        increment_card_counter
         break
       elsif guess == "SKIP"
         puts "\nThe answer was: #{card.back}\n"
+        increment_card_counter
         break
       end
       puts "\nIncorrect guess! #{2-attempts} guesses left."
-      puts "The answer was: #{card.back}\n" if attempts == 2
+      if attempts == 2
+        puts "The answer was: #{card.back}\n"
+        increment_card_counter
+      end
       attempts += 1
     end
   end
 
-  def self.build_deck(deck_file)
-    if deck_file =~ (/\.csv/)
-      DeckBuilder.csv_to_deck(deck_file)
-    else
-      raise "Invalid deck file."
-    end
+  def self.percent_correct
+    return 0 if @@card_counter == 0 && @@correct_counter == 0
+    ((@@correct_counter.to_f / @@card_counter.to_f) * 100).floor
   end
+
+  def self.increment_correct_counter
+    @@correct_counter += 1
+  end
+
+  def self.increment_card_counter
+    @@card_counter += 1
+  end
+
+  def self.reset_counters
+    @@correct_counter = 0
+    @@card_counter = 0
+  end
+
 end
 
 
