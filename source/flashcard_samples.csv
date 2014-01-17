@@ -1,0 +1,8 @@
+To create a second name for the variable or method,alias
+A command that appends two or more objects together,and
+Designates code that must be run unconditionally at the beginning of the program before any other,BEGIN
+Delimits a begin block of code which can allow the use of while and until in modifier position with multi-line statements,begin
+Gives an unconditional termination to a code block and is usually placed with an argument,break
+starts a case statement; this block of code will output a result and end when it's terms are fulfilled which are defined with when or else, case
+Opens a class definition block which can later be reopened and added to with variables and even functions,class
+Used to define a function,def
