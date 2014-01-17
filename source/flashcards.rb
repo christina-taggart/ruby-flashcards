@@ -62,12 +62,11 @@ end
 #---FLASHCARDS - CLI FLASHCARD VIEWER-----
 
 class FlashCards
-  def self.quiz(csv_file, quiz_type)
-    deck = DeckBuilder.csv_to_deck(csv_file)
-    card_mode = :top_card if quiz_type == "ordered"
-    card_mode = :random_card if quiz_type == "random"
+  def self.quiz(deck_file, quiz_type = "ordered")
+    deck = build_deck(deck_file)
+    deck.shuffle if quiz_type == "random"
     deck.length.times do
-      test_card(deck.send(card_mode))
+      test_card(deck.top_card)
     end
   end
 
@@ -76,23 +75,35 @@ class FlashCards
   def self.test_card(card)
     attempts = 0
     guess = String.new
-    while attempts <= 3
-      puts "FRONT:"
-      puts "#{card.front}\n"
+    while attempts < 3
+      puts "\nFRONT:"
+      puts "#{card.front}"
       puts "Enter guess (or 'SKIP'):"
       guess = gets.chomp
-      break if guess == card.back || guess == "SKIP"
+      if guess == card.back
+        puts "\nCorrect!\n"
+        break
+      elsif guess == "SKIP"
+        puts "\nThe answer was: #{card.back}\n"
+        break
+      end
+      puts "\nIncorrect guess! #{2-attempts} guesses left."
+      puts "The answer was: #{card.back}\n" if attempts == 2
       attempts += 1
+    end
+  end
+
+  def self.build_deck(deck_file)
+    if deck_file =~ (/\.csv/)
+      DeckBuilder.csv_to_deck(deck_file)
+    else
+      raise "Invalid deck file."
     end
   end
 end
 
-#-----DRIVERS-----
-# test_deck = DeckBuilder.csv_to_deck("ruby_deck.csv")
-# 5.times { p test_deck.top_card }
-
 
 #-----ARGVifying FLASHCARDS-----
-csv_file = ARGV[0]
-quiz_type = ARGV[1]
-FlashCards.quiz(csv_file, quiz_type)
+file = ARGV.shift
+quiz_type = ARGV.shift
+FlashCards.quiz(file, quiz_type)
