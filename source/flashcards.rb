@@ -63,12 +63,14 @@ end
 class FlashCards
   @@correct_counter = 0
   @@card_counter = 0
+  @@exit = false
 
   def self.quiz(deck_file, quiz_type = "ordered")
     deck = DeckBuilder.csv_to_deck(deck_file)
     reset_counters
     deck.shuffle if quiz_type == "random"
     deck.length.times do
+      break if @@exit == true
       test_card(deck.top_card)
     end
     puts "\nDECK QUIZ COMPLETE!"
@@ -92,6 +94,9 @@ class FlashCards
       elsif guess == "SKIP"
         puts "\nThe answer was: #{card.back}\n"
         increment_card_counter
+        break
+      elsif guess == "EXIT"
+        @@exit = true
         break
       end
       puts "\nIncorrect guess! #{2-attempts} guesses left."
