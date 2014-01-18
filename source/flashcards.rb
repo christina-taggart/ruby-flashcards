@@ -123,17 +123,33 @@ class Launcher
   def run
     @console.greeting
     until @deck.empty?
-      @console.display_top_card(@deck.grab_top_card)
-      @quiz.guessed_correctly = false
-      until @quiz.guessed_correctly.eql?(true)
-        @console.prompt_guess
-        @quiz.accept_guess
-        @quiz.check_guess(@deck.grab_top_card) ? @console.display_guessed_correctly : @console.display_guessed_wrong #displays correct or wrong depending on the guess
-      end
-      @deck.remove_card(@deck.grab_top_card)
-      @console.display_removed_card_message
-      @console.display_cards_remaining(@deck)
+      show_card_to_user
+      reset_guess
+      check_guesses
+      remove_card
     end
+  end
+
+  def remove_card
+    @deck.remove_card(@deck.grab_top_card)
+    @console.display_removed_card_message
+    @console.display_cards_remaining(@deck)
+  end
+
+  def check_guesses
+    until @quiz.guessed_correctly.eql?(true)
+      @console.prompt_guess
+      @quiz.accept_guess
+      @quiz.check_guess(@deck.grab_top_card) ? @console.display_guessed_correctly : @console.display_guessed_wrong #displays correct or wrong depending on the guess
+    end
+  end
+
+  def show_card_to_user
+    @console.display_top_card(@deck.grab_top_card)
+  end
+
+  def reset_guess
+    @quiz.guessed_correctly = false
   end
 end
 
