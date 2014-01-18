@@ -1,6 +1,14 @@
+require 'colorize'
+
 module CardFactory
   def self.create_card(flashcard_data) # ["Software company in Seattle", "Microsoft"]
     Card.new(flashcard_data[0], flashcard_data[1])
+  end
+  def self.generate_cards(card_info) # this is a 2D array
+    card_info.map! do |card|
+      create_card(card)
+    end
+    # card_info # this is now an array of card objects
   end
 end
 
@@ -13,7 +21,7 @@ class Card
     @correct
   end
   def to_s
-    "#{@definition}"
+    "#{@definition}".word_wrap(100)
   end
 end
 
@@ -24,36 +32,44 @@ class Deck
   end
 end
 
-# factory_test = CardFactory.create_card(["Software company in Seattle", "Microsoft"])
-# p factory_test
-
 class Quiz
   def initialize(deck)
     @deck = deck
   end
   def quiz!
-    @deck.cards.each do |card|
-      p card
-      print "Concept: "
-      answer = gets.chomp!
-      check_answer(answer, card)
-    end
-    correct_or_not
+    @deck.cards.each { |card| prompt_user(card) }
     display_results
+  end
+  def display_results
+    correct_or_not
+    display_correct_or_not
+  end
+
+  def prompt_user(card)
+    p card
+    print "Educated Guess: ".blue
+    answer = gets.chomp!
+    check_answer(answer, card)
   end
   def check_answer(answer, card)
     if answer == card.concept
-      puts "You are correct"
+      puts "You are correct".green
       card.correct = true
+    elsif answer == "skip"
+      return
+    elsif answer == "exit"
+      display_results
+      abort("Great Job!".yellow)
     else
-      puts "You should review that one"
+      puts "Try again please!".red
+      prompt_user(card)
     end
   end
   def correct_or_not
     @correct_cards = @deck.cards.select {|card| card.correct}
     @incorrect_cards = @deck.cards.select{|card| !card.correct}
   end
-  def display_results
+  def display_correct_or_not
     puts "You know these really well: "
     @correct_cards.each {|card| puts "\t#{card}"}
     puts "You should review these:"
@@ -61,46 +77,33 @@ class Quiz
   end
 end
 
-class Controller
-
-  def initialize
-    #make cards?
-    @card_content_array = []
+class Pre_Game
+  def self.set_up_game(source_file) # specify where you're getting your card data
+    card_info = Pre_Game.format_txt_file(source_file) # format the cards
+    card_objects = CardFactory.generate_cards(card_info) # turn cards into objects
+    Deck.new(card_objects) # create new deck with these card objects
   end
-
-  def format_txt_file
-    File.readlines("flashcard_samples.txt").each_slice(3){|s|
-      p @card_content_array = [s[0].strip, s[1].strip]
-      }
+  def self.format_txt_file(source_file)
+    card_content_array = []
+    File.readlines(source_file).each_slice(3) do |s|
+      card_content_array << [s[0].strip, s[1].strip]
+    end
+    card_content_array
   end
-
 end
 
+class String
+  def word_wrap n
+    words = self.split ' '
+    str = words.shift
+    words.each do |word|
+      connection = (str.size - str.rindex("\n").to_i + word.size > n) ? "\n\t" : " "
+      str += connection + word
+    end
+    "#{str} \n\n"
+  end
+end
 
-test1 = Card.new("Software company in Seattle", "Microsoft")
-test2 = Card.new("Two plus two is...", "four")
-test3 = Card.new("City in which DBC is located? (in CA)", "San Francisco")
-
-deck = Deck.new([test1, test2, test3])
-
-quiz = Quiz.new(deck)
-quiz.quiz!
-
-# deck.each do |card|
-#   p card
-#   print "Concept: "
-#   concept = gets.chomp!
-#   if concept == card.concept
-#     puts "You are correct"
-#     card.correct = true
-#   else
-#     puts "You should review that one"
-#   end
-# end
-
-# correct_cards = deck.select {|card| card.correct}
-# incorrect_cards = deck.select{|card| !card.correct}
-# puts "You know these really well: "
-# correct_cards.each {|card| puts "\t#{card}"}
-# puts "You should review these:"
-# incorrect_cards.each {|card| puts "\t#{card}"}
+flash_cards = Pre_Game.set_up_game("flashcard_samples.txt")
+game = Quiz.new(flash_cards)
+game.quiz!
