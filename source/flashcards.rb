@@ -17,14 +17,13 @@ class Pre_Game
 end
 
 module CardFactory
-  def self.create_card(flashcard_data) # ["Software company in Seattle", "Microsoft"]
+  def self.create_card(flashcard_data)
     Card.new(flashcard_data[0], flashcard_data[1])
   end
   def self.generate_cards(card_info) # this is a 2D array
     card_info.map! do |card|
       create_card(card)
     end
-    # card_info # this is now an array of card objects
   end
 end
 
@@ -46,9 +45,6 @@ class Deck
   def initialize(cards)
     @cards = cards #this is an array of card objects
   end
-  # def shuffle!
-  #   @cards.shuffle
-  # end
 end
 
 class Quiz
