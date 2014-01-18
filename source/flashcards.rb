@@ -58,7 +58,7 @@ class Deck
 end
 
 
-#---FLASHCARDS - CLI FLASHCARD VIEWER-----
+#---FLASHCARDS - CLI FLASHCARD QUIZZER-----
 
 class FlashCards
   @@correct_counter = 0
@@ -73,8 +73,7 @@ class FlashCards
       break if @@exit == true
       test_card(deck.top_card)
     end
-    puts "\nDECK QUIZ COMPLETE!"
-    puts "PERCENT CORRECT: #{percent_correct}%"
+    display_score
   end
 
   private
@@ -83,31 +82,56 @@ class FlashCards
     attempts = 0
     guess = String.new
     while attempts < 3
-      puts "\n#{card.front}"
-      puts "Enter guess (or 'SKIP' or 'EXIT'):"
+      display_card(card)
       guess = gets.chomp
       case guess
       when card.back.downcase
-        puts "\nCorrect!\n"
-        increment_correct_counter
-        increment_card_counter
+        correct_guess
         break
       when "SKIP"
-        puts "\nThe answer was: #{card.back}\n"
-        increment_card_counter
+        skip_card(card)
         break
       when "EXIT"
-        @@exit = true
+        exit_quiz
         break
       else
-        puts "\nIncorrect guess! #{2-attempts} guesses left."
-        if attempts == 2
-          puts "The answer was: #{card.back}\n"
-          increment_card_counter
-        end
+        incorrect_guess(card, attempts)
       end
       attempts += 1
     end
+  end
+
+  def self.display_card(card)
+    puts "\n#{card.front}"
+    puts "Enter guess (or 'SKIP' or 'EXIT'):"
+  end
+
+  def self.display_score
+    puts "\nQUIZ COMPLETE!"
+    puts "PERCENT CORRECT: #{percent_correct}%"
+  end
+
+  def self.correct_guess
+    puts "\nCorrect!\n"
+    increment_correct_counter
+    increment_card_counter
+  end
+
+  def self.incorrect_guess(card, attempts)
+    puts "\nIncorrect guess! #{2-attempts} guesses left."
+    if attempts == 2
+      puts "The answer was: #{card.back}\n"
+      increment_card_counter
+    end
+  end
+
+  def self.skip_card(card)
+    puts "\nThe answer was: #{card.back}\n"
+    increment_card_counter
+  end
+
+  def self.exit_quiz
+    @@exit = true
   end
 
   def self.percent_correct
