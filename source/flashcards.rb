@@ -61,55 +61,82 @@ class Deck
   end
 end
 
-# TODO: This will become the view at some point....
-class Interface
-  def initialize(deck)
-    @deck = deck
+class Console
+  def initialize
   end
 
   def greeting
     puts "Welcome to Ruby Flash Cards. To play, just enter the correct term for each definition.  Ready?  Go!"
   end
 
-  def show_top_card
-    @current_card = @deck.grab_top_card
+  def display_top_card(current_flashcard)
     print "\nDefinition: "
-    puts "\n#{@current_card.definition}\n"
+    puts "\n#{current_flashcard.definition}\n"
   end
 
   def prompt_guess
-    print "Guess: "
-    @guess = gets.chomp
+     print "Guess: "
   end
 
-  def check_guess
-    if @guess.eql?(@current_card.term)
+  def display_guessed_correctly
+    puts "Correct!"
+  end
+
+  def display_guessed_wrong
+    puts "Wrong!"
+  end
+
+  def display_removed_card_message
+    "Card was removed from deck!"
+  end
+
+  def display_cards_remaining(deck)
+    puts "#{deck.count} cards remaning in this deck."
+  end
+end
+
+class Quizzer
+  attr_accessor :guessed_correctly
+  def initialize
+  end
+
+  def accept_guess
+     @guess = gets.chomp
+  end
+
+  def check_guess(top_card)
+    if @guess.eql?(top_card.term)
       @guessed_correctly = true
-      puts "Correct!"
     else
       @guessed_correctly = false
-      puts "Wrong!"
     end
   end
+end
 
-  def test_knowledge
+class Launcher
+  def initialize
+    @deck = Deck.new
+    @console = Console.new
+    @quiz = Quizzer.new
+  end
+
+  def run
+    @console.greeting
     until @deck.empty?
-      show_top_card
-      @guessed_correctly = false
-      until @guessed_correctly.eql?(true)
-        prompt_guess
-        check_guess
+      @console.display_top_card(@deck.grab_top_card)
+      @quiz.guessed_correctly = false
+      until @quiz.guessed_correctly.eql?(true)
+        @console.prompt_guess
+        @quiz.accept_guess
+        @quiz.check_guess(@deck.grab_top_card) ? @console.display_guessed_correctly : @console.display_guessed_wrong #displays correct or wrong depending on the guess
       end
       @deck.remove_card(@deck.grab_top_card)
-      puts "Card was removed from deck!"
-      puts @deck.count
+      @console.display_removed_card_message
+      @console.display_cards_remaining(@deck)
     end
   end
 end
 
 # DRIVER CODE
+Launcher.new.run
 
-this_deck = Deck.new
-my_game = Interface.new(this_deck)
-my_game.greeting
-my_game.test_knowledge
