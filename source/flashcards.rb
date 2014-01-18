@@ -128,6 +128,7 @@ class FlashCards
   end
 end
 
+
 #-----FLASHCARDSVIEWER (VIEWER)-----
 
 class FlashCardsViewer
