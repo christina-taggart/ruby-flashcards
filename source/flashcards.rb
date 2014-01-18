@@ -2,7 +2,6 @@ Card = Struct.new(:question, :answer)
 
 class CardParser
   attr_accessor :cards
-  # getting all the cards, passing to model
   def initialize(file_name = "flashcard_samples.txt", fields = 2)
     @file_name = file_name
     @fields = fields
@@ -28,14 +27,6 @@ class CardParser
 end
 
 
-# class DeckBuilder
-#   attr_accessor :deck
-
-#   def initialize(cards = CardParser.new.cards)
-#     @deck =  cards.shuffle
-#   end
-# end
-
 class Controller
 
   def initialize(deck = CardParser.new.cards)
@@ -44,14 +35,15 @@ class Controller
   end
 
   def send_to_view
-    View.new(@deck)
+    Game.new(@deck)
   end
 
 end
 
-class View
-
-  def initialize(deck)
+class Game
+  attr_reader :view, :deck, :card, :try_num
+  def initialize(deck, view = View.new)
+    @view = view
     @deck = deck
     @card = nil
     @try_num = 3
@@ -64,7 +56,7 @@ class View
 
   def check_deck
     if @deck.empty?
-      puts "Game over, man! GAME OVER!!"
+      view.game_over
       exit
     end
   end
@@ -77,13 +69,12 @@ class View
 
   def ask_question
     prepare_question
-    puts "Definition"
-    puts "#{@card.question}"
+    view.print_question(@card.question)
     ask_for_answer
   end
 
   def ask_for_answer
-    print "Guess: "
+    view.ask_for_answer
     verify(gets.chomp)
   end
 
@@ -97,29 +88,29 @@ class View
   end
 
   def correct_answer
-    puts "Correct!\n"
+    view.correct_answer
     ask_question
   end
 
   def incorrect_answer
     if @try_num > 0
-      puts "Incorrect! You have #{@try_num} tries left.\n"
+      view.tries_left(@try_num)
       ask_for_answer
     else
-      puts "Sorry, you didn't get that one! The answer is: \"#{@card.answer}\""
+      view.question_failed(@card.answer)
       keep_playing?
     end
   end
 
   def keep_playing?
-    print "Keep Playing? y/n: "
+    view.ask_keep_playing?
     y_n = gets.chomp
     if y_n == "y"
       ask_question
     elsif y_n == "n"
-      puts "Thanks for playing!"
+      view.thank_player
     else
-      puts "Wut. Try that again."
+      view.wrong_input
       keep_playing?
     end
   end
@@ -130,12 +121,49 @@ class View
 
 end
 
-class Verify
+class View
+
+  def initialize
+  end
+
+  def game_over
+    puts "Game over, man! GAME OVER!!"
+  end
+
+  def print_question(question)
+    puts "Definition"
+    puts "#{question}"
+  end
+
+  def ask_for_answer
+    print "Guess: "
+  end
+
+  def correct_answer
+    puts "Correct!\n"
+  end
+
+  def tries_left(try_num)
+    puts "Incorrect! You have #{try_num} tries left. \n"
+  end
+
+  def question_failed(answer)
+    puts "Sorry, you didn't get that one! The answer is: \"#{answer}\""
+  end
+
+  def ask_keep_playing?
+    puts "Keep playing? y/n: "
+  end
+
+  def thank_player
+    puts "Thanks for playing!"
+  end
+
+  def wrong_input
+    puts "Input not recognized. Try again."
+  end
 
 end
 
 
-
-# puts CardParser.new.cards
-# puts "---------------------"
 Controller.new
