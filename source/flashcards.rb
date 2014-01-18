@@ -13,7 +13,7 @@ module DeckBuilder
 end
 
 
-#-----CARD & DECK CLASSES-----
+#-----CARD & DECK CLASSES (MODEL)-----
 
 class Card
   attr_reader :front, :back
@@ -58,7 +58,7 @@ class Deck
 end
 
 
-#---FLASHCARDS - CLI FLASHCARD QUIZZER-----
+#---FLASHCARDS QUIZZER (CONTROLLER)-----
 
 class FlashCards
   @@correct_counter = 0
@@ -73,7 +73,7 @@ class FlashCards
       break if @@exit == true
       test_card(deck.top_card)
     end
-    display_score
+    FlashCardsViewer.display_score(percent_correct)
   end
 
   private
@@ -82,52 +82,27 @@ class FlashCards
     attempts = 0
     guess = String.new
     while attempts < 3
-      display_card(card)
+      FlashCardsViewer.display_card(card)
       guess = gets.chomp
       case guess
       when card.back.downcase
-        correct_guess
+        FlashCardsViewer.correct_guess
+        increment_correct_counter
+        increment_card_counter
         break
       when "SKIP"
-        skip_card(card)
+        FlashCardsViewer.skip_card(card)
+        increment_card_counter
         break
       when "EXIT"
         exit_quiz
         break
       else
-        incorrect_guess(card, attempts)
+        FlashCardsViewer.incorrect_guess(card, attempts)
+        increment_card_counter
       end
       attempts += 1
     end
-  end
-
-  def self.display_card(card)
-    puts "\n#{card.front}"
-    puts "Enter guess (or 'SKIP' or 'EXIT'):"
-  end
-
-  def self.display_score
-    puts "\nQUIZ COMPLETE!"
-    puts "PERCENT CORRECT: #{percent_correct}%"
-  end
-
-  def self.correct_guess
-    puts "\nCorrect!\n"
-    increment_correct_counter
-    increment_card_counter
-  end
-
-  def self.incorrect_guess(card, attempts)
-    puts "\nIncorrect guess! #{2-attempts} guesses left."
-    if attempts == 2
-      puts "The answer was: #{card.back}\n"
-      increment_card_counter
-    end
-  end
-
-  def self.skip_card(card)
-    puts "\nThe answer was: #{card.back}\n"
-    increment_card_counter
   end
 
   def self.exit_quiz
@@ -151,7 +126,35 @@ class FlashCards
     @@correct_counter = 0
     @@card_counter = 0
   end
+end
 
+#-----FLASHCARDSVIEWER (VIEWER)-----
+
+class FlashCardsViewer
+  def self.display_card(card)
+    puts "\n#{card.front}"
+    puts "Enter guess (or 'SKIP' or 'EXIT'):"
+  end
+
+  def self.display_score(percent_correct)
+    puts "\nQUIZ COMPLETE!"
+    puts "PERCENT CORRECT: #{percent_correct}%"
+  end
+
+  def self.correct_guess
+    puts "\nCorrect!\n"
+  end
+
+  def self.incorrect_guess(card, attempts)
+    puts "\nIncorrect guess! #{2-attempts} guesses left."
+    if attempts == 2
+      puts "The answer was: #{card.back}\n"
+    end
+  end
+
+  def self.skip_card(card)
+    puts "\nThe answer was: #{card.back}\n"
+  end
 end
 
 
