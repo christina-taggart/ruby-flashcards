@@ -84,25 +84,27 @@ class FlashCards
     guess = String.new
     while attempts < 3
       puts "\n#{card.front}"
-      puts "Enter guess (or 'SKIP'):"
+      puts "Enter guess (or 'SKIP' or 'EXIT'):"
       guess = gets.chomp
-      if guess.downcase == card.back.downcase
+      case guess
+      when card.back.downcase
         puts "\nCorrect!\n"
         increment_correct_counter
         increment_card_counter
         break
-      elsif guess == "SKIP"
+      when "SKIP"
         puts "\nThe answer was: #{card.back}\n"
         increment_card_counter
         break
-      elsif guess == "EXIT"
+      when "EXIT"
         @@exit = true
         break
-      end
-      puts "\nIncorrect guess! #{2-attempts} guesses left."
-      if attempts == 2
-        puts "The answer was: #{card.back}\n"
-        increment_card_counter
+      else
+        puts "\nIncorrect guess! #{2-attempts} guesses left."
+        if attempts == 2
+          puts "The answer was: #{card.back}\n"
+          increment_card_counter
+        end
       end
       attempts += 1
     end
