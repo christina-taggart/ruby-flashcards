@@ -14,7 +14,7 @@ module DeckHelpers
   end
 end
 
-###MODEL
+###MODELS
 class FlashCards
   def initialize(definition, term)
     @definition = definition
@@ -65,7 +65,6 @@ end
 class Interface
   def initialize(deck)
     @deck = deck
-    @current_card = @deck.grab_top_card
   end
 
   def greeting
@@ -73,8 +72,9 @@ class Interface
   end
 
   def show_top_card
-    puts "Definition:"
-    puts @current_card.definition
+    @current_card = @deck.grab_top_card
+    print "\nDefinition: "
+    puts "\n#{@current_card.definition}\n"
   end
 
   def prompt_guess
@@ -93,59 +93,23 @@ class Interface
   end
 
   def test_knowledge
-    until @guessed_correctly.eql?(true)
-      prompt_guess
-      check_guess
+    until @deck.empty?
+      show_top_card
+      @guessed_correctly = false
+      until @guessed_correctly.eql?(true)
+        prompt_guess
+        check_guess
+      end
+      @deck.remove_card(@deck.grab_top_card)
+      puts "Card was removed from deck!"
+      puts @deck.count
     end
-    @deck.remove_card(@deck.grab_top_card)
-    puts "Card was removed from deck!"
-    puts @deck.count
   end
 end
 
-# class Controller
-#   def initialize
-#     @deck = Deck.new
-#     @game_interface = Interface.new
-#   end
+# DRIVER CODE
 
-#   def run
-#     @game_interface.greeting
-#     until @deck.empty?
-#       @game_interface.show_top_card
-#       @game_interface.test_knowledge
-#     end
-#   end
-# end
-# Driver Code
-# flashcard_1 = FlashCards.new("What day is today?", "Friday")
-# p flashcard_1
-
-
-# p this_deck
-
-# this_deck.add_card(flashcard_1)
-# p this_deck
-
-# this_deck.remove_card(flashcard_1)
-# p this_deck
-
-# flashcard_2 = FlashCards.new("Where are we?", "Dev Bootcamp")
-# this_deck.add_card(flashcard_2)
-# flashcard_3 = FlashCards.new("What do we do?", "Code!!!!")
-# this_deck.add_card(flashcard_3)
-# p this_deck
-# this_deck.shuffle_deck!
-# p this_deck
-
-
-# This was working... before controller!
 this_deck = Deck.new
 my_game = Interface.new(this_deck)
 my_game.greeting
-my_game.show_top_card
 my_game.test_knowledge
-# my_controller = Controller.new
-# my_controller.run
-
-# <Deck:0x007f984985e100 @deck=[#<FlashCards:0x007f984985de80 @definition="What do we do?", @term="Code!!!!">, #<FlashCards:0x007f984985def8 @definition="Where are we?", @term="Dev Bootcamp">]>
