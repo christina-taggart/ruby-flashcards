@@ -1,4 +1,5 @@
 # Main file for flashcards
+require 'paint'
 
 class View
   def initialize
@@ -9,6 +10,7 @@ class View
     puts <<-eos
       Welcome to the negative Nancy flashcard game. Play. Or don't. I don't care.
       To quit, type: 'I am worthless'
+      ---------------------------------
     eos
   end
 
@@ -25,11 +27,11 @@ class View
     puts card.term
   end
 
-  def print_report(game)
-    puts "Number Correct: #{game.number_solved}"
-    puts "Number Incorrect: #{game.number_unsolved}"
+  def print_report(metrics)
+    puts "\nFinal Score Report\n"
+    puts "Number Correct: " + Paint[ metrics[:number_solved], :green]
+    puts "Number Incorrect: " + Paint[ metrics[:number_unsolved], :red]
   end
-
 end
 
 class Controller
@@ -40,35 +42,44 @@ class Controller
   end
 
   def run_game
-    while @model.deck.unsolved.length > 0
+    while number_unsolved > 0
       @current_card = top_card
       @current_answer = @view.print_definition(@current_card)
       break if @current_answer == "I am worthless"
-      if @current_answer == @current_card.term
-        puts "correct!"
-        @model.deck.card_correct!
-      else
-        puts "incorrect!"
-        @model.deck.card_incorrect!
-      end
+      validate_answer
     end
-    @view.print_report(@model.game)
+    @view.print_report({number_solved: number_solved, number_unsolved: number_unsolved})
+  end
+
+  def validate_answer
+    if @current_answer == @current_card.term
+      puts "correct!"
+      deck.card_correct!
+    else
+      puts "incorrect!"
+      deck.card_incorrect!
+    end
   end
 
   def check_response
     @model.check_definition
   end
 
-  def top_card
-    @model.deck.unsolved.first
+  def deck
+    @model.deck
   end
-  # Start game
-  # Display start screen
-  # Show first card
-  # get user input
-  # send input to model and call appropriate view
-  # repeat
-  # if input is exit message, exit program
+
+  def top_card
+    deck.unsolved.first
+  end
+
+  def number_solved
+    deck.solved.length
+  end
+
+  def number_unsolved
+    deck.unsolved.length
+  end
 
 end
 
@@ -79,7 +90,7 @@ class Model
     @data_from_file = []
     import_from_txt
     @deck = Deck.new(@data_from_file)
-    @game = Game.new(@deck)
+    # @game = Game.new(@deck)
   end
 
   private
@@ -139,19 +150,19 @@ class Deck
   end
 end
 
-class Game
-  def initialize(deck)
-    @deck = deck
-  end
+# class Game
+#   def initialize(deck)
+#     @deck = deck
+#   end
 
-  def number_solved
-    @deck.solved.length
-  end
+#   def number_solved
+#     @deck.solved.length
+#   end
 
-  def number_unsolved
-    @deck.unsolved.length
-  end
-end
+#   def number_unsolved
+#     @deck.unsolved.length
+#   end
+# end
 
 # model = Model.new
 # deck = Deck.new(model.data_from_file)
