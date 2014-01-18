@@ -58,9 +58,9 @@ class Deck
 end
 
 
-#---FLASHCARDS QUIZZER (CONTROLLER)-----
+#---FLASHCARDS MODULE (CONTROLLER)-----
 
-class FlashCards
+module FlashCards
   @@correct_counter = 0
   @@card_counter = 0
   @@exit = false
@@ -129,9 +129,9 @@ class FlashCards
 end
 
 
-#-----FLASHCARDSVIEWER (VIEWER)-----
+#-----FLASHCARDSVIEWER MODULE (VIEWER)-----
 
-class FlashCardsViewer
+module FlashCardsViewer
   def self.display_card(card)
     puts "\n#{card.front}"
     puts "Enter guess (or 'SKIP' or 'EXIT'):"
