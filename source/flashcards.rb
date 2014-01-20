@@ -61,6 +61,7 @@ end
 #---FLASHCARDS MODULE (CONTROLLER)-----
 
 module FlashCards
+  #REVIEW
   @@correct_counter = 0
   @@card_counter = 0
   @@exit = false
