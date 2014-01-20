@@ -96,20 +96,10 @@ class Model
   private
 
     def import_from_txt
-      File.open(@source_file, 'r') do |file|
-        @current_hash = {}
-        file.each_line {|line| populate_data_from_file(line) }
-      end
-    end
-
-    def populate_data_from_file(line)
-      if $. % 3 == 1
-        @current_hash[:definition] = line.chomp
-      elsif $. % 3 == 2
-        @current_hash[:term] = line.chomp
-        @data_from_file << @current_hash
-        @current_hash = {}
-      end
+      @current_hash = {}
+      content = File.read(@source_file).split("\n")
+      content.delete("")
+      content.each_slice(2).to_a.each { |element| @data_from_file << { term: element[1], definition: element[0] }}
     end
 end
 
