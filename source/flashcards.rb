@@ -4,7 +4,7 @@ class Game
   def initialize
     @score = 0
     @deck = Deck.new("flashcard_samples.csv").all_cards
-    play_game
+    # play_game   #REVIEW - separation of concerns
   end
 
   def play_game
@@ -76,31 +76,27 @@ class AwardPoints
     puts @flashcard.question
   end
 
-  def correct
-    case
-      when @flashcard.difficulty == "easy"
-        points_for_turn = 1
-        @score += points_for_turn
-      when @flashcard.difficulty == "medium"
-        points_for_turn = 3
-        @score += points_for_turn
-      when @flashcard.difficulty == "hard"
-        points_for_turn = 5
-        @score += points_for_turn
-      else
-        puts "ERROR"
-    end
-    puts "Congrats, you got it right and earned #{points_for_turn} points. Your total score is #{@score}"
+  def points_for_turn
+    points={"easy" => 1, "medium" => 3, "hard" => 5}
+    points[@flashcard.difficulty] || 0 
   end
 
-  def exit
-    abort("Thanks for playing.")
-  end
 
-  def score
-    puts "You currently have #{@score} points. Great Job!"
-    puts @flashcard.question
-  end
+def correct
+  
+  @score += points_for_turn
+
+  puts "Congrats, you got it right and earned #{points_for_turn} points. Your total score is #{@score}"
+end
+
+def exit
+  abort("Thanks for playing.")
+end
+
+def score
+  puts "You currently have #{@score} points. Great Job!"
+  puts @flashcard.question
+end
 end
 
 class Card
@@ -112,4 +108,8 @@ class Card
   end
 end
 
-Game.new
+# game= Game.new
+# game.play_game
+
+award_points = AwardPoints.new Card.new "yo", "yo", "medium"
+puts award_points.points_for_turn == 3
