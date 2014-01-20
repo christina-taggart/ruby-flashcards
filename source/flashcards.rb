@@ -70,10 +70,14 @@ class AwardPoints
   end
 
   def ask_question
+    show_intro #REVIEW separation of concerns
+    puts @flashcard
+  end
+
+  def show_intro
     puts ""
     puts "Here is your question. Type \"exit\" to stop playing at anytime or \"score\" to view your current score ."
     puts "---------"
-    puts @flashcard.question
   end
 
   def correct
@@ -99,7 +103,7 @@ class AwardPoints
 
   def score
     puts "You currently have #{@score} points. Great Job!"
-    puts @flashcard.question
+    puts @flashcard
   end
 end
 
@@ -110,6 +114,17 @@ class Card
     @answer = answer
     @difficulty = difficulty
   end
+
+  def to_s
+    self.question
+  end
 end
 
-Game.new
+# Game.new
+card = Card.new('This is a question!', 'answer', '3')
+award_points = AwardPoints.new(card)
+
+award_points.show_intro
+
+award_points.ask_question
+
