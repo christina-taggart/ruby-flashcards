@@ -26,7 +26,7 @@ class Game
   def ask_question(flashcard)
     number_of_attempts = 3
     new_award = get_flashcard_award(flashcard)
-    new_award.ask_question
+    ask_question
     user_answer = gets.chomp
 
     while number_of_attempts > 0
@@ -34,9 +34,9 @@ class Game
         new_award.correct
         number_of_attempts = 0
       elsif user_answer == "exit"
-        new_award.exit
+        exit
       elsif user_answer == "score"
-        new_award.score
+        score
         user_answer = gets.chomp
       elsif user_answer.downcase != flashcard.answer.downcase
         number_of_attempts -= 1
@@ -49,6 +49,24 @@ class Game
         end
       end
     end
+  end
+
+  # REVIEW moved these methods from AwardPoints to reduce Game's
+  # dependency on AwardPoints.
+  def score
+    puts "You currently have #{@score} points. Great Job!"
+    puts flashcard.question
+  end
+
+  def exit
+    abort("Thanks for playing.")
+  end
+
+  def ask_question
+    puts ""
+    puts "Here is your question. Type \"exit\" to stop playing at anytime or \"score\" to view your current score ."
+    puts "---------"
+    puts flashcard.question
   end
 end
 
@@ -67,18 +85,12 @@ class Deck
   end
 end
 
+
 class AwardPoints
   def initialize(flashcard)
     @flashcard = flashcard
     @score = 0
     @number_of_attempts = 3
-  end
-
-  def ask_question
-    puts ""
-    puts "Here is your question. Type \"exit\" to stop playing at anytime or \"score\" to view your current score ."
-    puts "---------"
-    puts @flashcard.question
   end
 
   def correct
@@ -96,15 +108,6 @@ class AwardPoints
         puts "ERROR"
     end
     puts "Congrats, you got it right and earned #{points_for_turn} points. Your total score is #{@score}"
-  end
-
-  def exit
-    abort("Thanks for playing.")
-  end
-
-  def score
-    puts "You currently have #{@score} points. Great Job!"
-    puts @flashcard.question
   end
 end
 
