@@ -43,7 +43,7 @@ class Controller
 
   def run_game
     while number_unsolved > 0
-      @current_card = top_card
+      @current_card = deck.top_card
       @current_answer = @view.print_definition(@current_card)
       break if @current_answer == "I am worthless"
       validate_answer
@@ -69,16 +69,12 @@ class Controller
     @model.deck
   end
 
-  def top_card
-    deck.unsolved.first
-  end
-
   def number_solved
-    deck.solved.length
+    deck.num_solved
   end
 
   def number_unsolved
-    deck.unsolved.length
+    deck.num_unsolved
   end
 
 end
@@ -90,7 +86,6 @@ class Model
     @data_from_file = []
     import_from_txt
     @deck = Deck.new(@data_from_file)
-    # @game = Game.new(@deck)
   end
 
   private
@@ -122,12 +117,14 @@ class Card
 end
 
 class Deck
-  attr_reader :unsolved, :solved
+  attr_reader :unsolved, :solved, :num_solved, :num_unsolved
   def initialize(deck_data)
     @deck_data = deck_data
     @unsolved = []
     @solved = []
     create_cards
+    @num_solved = @solved.length
+    @num_unsolved = @unsolved.length
   end
 
   def create_cards
@@ -149,23 +146,5 @@ class Deck
     @unsolved.rotate!
   end
 end
-
-# class Game
-#   def initialize(deck)
-#     @deck = deck
-#   end
-
-#   def number_solved
-#     @deck.solved.length
-#   end
-
-#   def number_unsolved
-#     @deck.unsolved.length
-#   end
-# end
-
-# model = Model.new
-# deck = Deck.new(model.data_from_file)
-# puts deck.unsolved
 
 Controller.new
