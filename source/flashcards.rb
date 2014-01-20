@@ -1,5 +1,3 @@
-# Main file for
-
 class Card
   attr_reader :term, :definition
   attr_accessor :attempts
@@ -21,14 +19,24 @@ class Deck
 
   def initialize(filename)
     @completed = []
+    get_cards(filename)
+  end
+
+  def get_cards(filename)
+    @cards = []
+    create_cards(parse_file(filename))
+  end
+
+  def parse_file(filename)
     trimmed_array = []
     File.open('flashcard_samples.txt', 'r+') do |f|
       trimmed_array = f.select { |line| line.chomp! != "" }
     end
-    card_args = trimmed_array.each_slice(2).to_a
-    @cards = []
+    trimmed_array.each_slice(2).to_a
+  end
 
-    card_args.each do |card|
+  def create_cards(card_data)
+    card_data.each do |card|
       params = {}
       params[:definition] = card[0]
       params[:term] = card[1]
