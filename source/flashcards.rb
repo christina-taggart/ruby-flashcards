@@ -28,6 +28,11 @@ class FlashCards
   def term
     @term
   end
+
+  def check_answer(user_input)
+    user_input == @term
+  end
+
 end
 
 class Deck
@@ -111,6 +116,7 @@ class Quizzer
       @guessed_correctly = false
     end
   end
+
 end
 
 class Launcher
@@ -142,6 +148,11 @@ class Launcher
       @quiz.accept_guess
       @quiz.check_guess(@deck.grab_top_card) ? @console.display_guessed_correctly : @console.display_guessed_wrong #displays correct or wrong depending on the guess
     end
+  end
+
+  def check_guess_with_card
+    # REVIEW this dosent actually work but you get what I mean
+    card.check_answer(user_input)
   end
 
   def show_card_to_user
