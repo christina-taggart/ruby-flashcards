@@ -18,9 +18,14 @@ class Game
     end
   end
 
+  # REVIEW Isolating the dependency on AwardPoints.
+  def get_flashcard_award(flashcard)
+    AwardPoints.new(flashcard)
+  end
+
   def ask_question(flashcard)
     number_of_attempts = 3
-    new_award = AwardPoints.new(flashcard)
+    new_award = get_flashcard_award(flashcard)
     new_award.ask_question
     user_answer = gets.chomp
 
